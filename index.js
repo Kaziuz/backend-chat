@@ -19,7 +19,8 @@ passport.deserializeUser((user, done) => {
 //////////////////////////////////////
 
 const app = express()
-dotenv.config({ path: './config.env' })
+
+dotenv.config({ path: './config/dev.env' })
 
 app.use(cors())
 
