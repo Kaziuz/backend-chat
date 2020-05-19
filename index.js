@@ -6,7 +6,6 @@ const chalk = require('chalk')
 const dotenv = require('dotenv')
 const bodyParser = require('body-parser')
 const cookieSession = require('cookie-session')
-const favicon = require('serve-favicon')
 
 let user = {}
 
