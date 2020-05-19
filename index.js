@@ -4,6 +4,8 @@ const passport = require('passport')
 const InstagramStrategy = require('passport-instagram').Strategy
 const chalk = require('chalk')
 const dotenv = require('dotenv')
+const bodyParser = require('body-parser')
+const cookieSession = require('cookie-session')
 
 let user = {}
 
@@ -16,15 +18,7 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((user, done) => {
   done(null, user)
 })
-//////////////////////////////////////
 
-const app = express()
-
-dotenv.config({ path: './config/dev.env' })
-
-app.use(cors())
-
-///////////////////////////////////////////////
 // instagram strategy auth user
 passport.use(new InstagramStrategy({
   clientID: process.env.CLIENT_ID_INS,
@@ -38,17 +32,52 @@ async (accessToken, refreshToken, profile, done) => {
   return done(null, profile)
 }
 ))
-///////////////////////////////////////
+//////////////////////////////////////
+
+const app = express()
+
+dotenv.config({ path: './config/dev.env' })
+
+app.use(bodyParser.json())
+app.use(cors())
+
+// cookie session
+app.use(cookieSession({
+  name: 'session-login',
+  maxAge: 30 * 24 * 60 * 60 * 1000, // 30 dias habilitada la cokoie
+  keys: [process.env.COOKIE_KEY] 
+}))
 
 app.use(passport.initialize())
+app.use(passport.session())
 
 // 1. el usuario se loguea
 app.get("/auth/instagram", passport.authenticate("instagram"))
-// 2. cuando el usuario concede acceso a la app, manejamos la respuesta de los servidores facebook/instagram
+
+// https://chat-app-bkend.herokuapp.com/auth/instagram/callback
+// 2. cuando el usuario concede acceso a la app, manejamos 
+// la respuesta de los servidores facebook/instagram
 app.get('/auth/instagram/callback', passport.authenticate("instagram"), (req, res) => {
-  res.send("redireccionar")
+  res.status(200).json({
+    status: 'success',
+    message: 'user login',
+    user: req.user,
+    cookies: req.cookies
+  })
 })
 
+// 3. los datos enviados por parte del usuario no son validos
+app.get('https://chat-app-bkend.herokuapp.com/auth/instagram/callback/fail', (res, res) => {
+  res.status(401).json({
+    status: 'error',
+    message: 'data is bad'
+  })
+})
+
+// url de solicitud de eliminación de datos
+// https://chat-app-bkend.herokuapp.com/auth/instagram/eliminate
+
+// https://chat-app-bkend.herokuapp.com/auth/logout
 app.get("/auth/logout", (req, res) => {
   user = {}
   req.logout()
@@ -60,4 +89,3 @@ const port = process.env.PORT || 5000
 app.listen(port, () => {
   console.log('server runing', port)
 })
-
