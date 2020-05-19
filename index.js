@@ -6,8 +6,16 @@ const chalk = require('chalk')
 const dotenv = require('dotenv')
 const bodyParser = require('body-parser')
 const cookieSession = require('cookie-session')
+const favicon = require('serve-favicon')
 
 let user = {}
+
+const app = express()
+
+dotenv.config({ path: './config/dev.env' })
+app.use(express.static(`${__dirname}/public`))
+app.use(cors())
+app.use(bodyParser.json())
 
 ////////////////////////////////////////////////////////////////
 // PASSPORT services config
@@ -23,8 +31,7 @@ passport.deserializeUser((user, done) => {
 passport.use(new InstagramStrategy({
   clientID: process.env.CLIENT_ID_INS,
   clientSecret: process.env.CLIENT_SECRET_INS,
-  callbackURL: "/auth/instagram/callback", // callback after user acept give data this app
-  proxy: true
+  callbackURL: "/auth/instagram/callback" // callback after user acept give data this app
 },
 async (accessToken, refreshToken, profile, done) => {
   console.log('profile', chalk.blue(JSON.stringify(profile)))
@@ -32,13 +39,7 @@ async (accessToken, refreshToken, profile, done) => {
   return done(null, profile)
 }
 ))
-//////////////////////////////////////
 
-const app = express()
-
-dotenv.config({ path: './config/dev.env' })
-
-app.use(bodyParser.json())
 // app.use(cors({
 //   origin: "https://nuevo-chat-c43f5.web.app",
 //   methods: "GET",
@@ -71,7 +72,7 @@ app.get('/auth/instagram/callback', passport.authenticate("instagram"), (req, re
 })
 
 // 3. los datos enviados por parte del usuario no son validos
-app.get('https://chat-app-bkend.herokuapp.com/auth/instagram/callback/fail', (res, res) => {
+app.get('https://chat-app-bkend.herokuapp.com/auth/instagram/callback/fail', (req, res) => {
   res.status(401).json({
     status: 'error',
     message: 'data is bad'

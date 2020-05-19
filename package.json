@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "server": "nodemon index.js" 
+    "server": "nodemon index.js"
   },
   "author": "johnny",
   "license": "ISC",
@@ -19,7 +19,8 @@
     "express": "^4.17.1",
     "nodemon": "^2.0.4",
     "passport": "^0.4.1",
-    "passport-instagram": "^1.0.0"
+    "passport-instagram": "^1.0.0",
+    "serve-favicon": "^2.5.0"
   },
   "engines": {
     "node": "12.6.0",
