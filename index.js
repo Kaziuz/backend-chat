@@ -39,11 +39,11 @@ const app = express()
 dotenv.config({ path: './config/dev.env' })
 
 app.use(bodyParser.json())
-app.use(cors({
-  origin: "https://nuevo-chat-c43f5.web.app",
-  methods: "GET",
-  credentials: true
-}))
+// app.use(cors({
+//   origin: "https://nuevo-chat-c43f5.web.app",
+//   methods: "GET",
+//   credentials: true
+// }))
 
 // cookie session
 app.use(cookieSession({
